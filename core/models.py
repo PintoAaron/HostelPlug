@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+from .validators import validate_file_size
+
 
 
 class Location(models.Model):
@@ -22,6 +24,12 @@ class Hostel(models.Model):
     
     class Meta:
         ordering = ['name']
+        
+
+class HostelImage(models.Model):
+    hostel = models.ForeignKey(Hostel, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='hostels/images',null=False,validators=[validate_file_size])
+    date_created = models.DateTimeField(auto_now_add=True)
 
 
 class Room(models.Model):

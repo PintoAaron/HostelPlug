@@ -5,22 +5,13 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser,IsAuthenticated
 
-from .models import User, Hostel, Location, Room, Review
+from .models import Hostel, Location, Room, Review, HostelImage
 from .permissions import IsAdminOrReadOnly
 from .pagination import DefaultPagination
-from .serializers import UserSerializer, HostelSerializer, LocationSerializer, RoomSerializer, HostelCreateSerialzer,ReviewSerializer
+from .serializers import HostelSerializer, LocationSerializer, RoomSerializer, HostelCreateSerialzer,ReviewSerializer, HostelImageSerializer
 
 
 
-
-class UserViewSet(ModelViewSet):
-    http_method_names = ['get','patch','delete','head','options']
-    
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAdminUser]        
-    
-    
 
 class LocationViewSet(ModelViewSet):
     queryset = Location.objects.annotate(hostel_count=Count('hostels')).all()
@@ -57,7 +48,6 @@ class RoomViewSet(ModelViewSet):
 
 
 class ReviewViewSet(ModelViewSet):
-    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
     
@@ -68,3 +58,14 @@ class ReviewViewSet(ModelViewSet):
         return {'hostel_id':self.kwargs['hostel_pk'],
                 'user_id':self.request.user.id
                 }
+        
+
+class HostelImageViewSet(ModelViewSet):
+    serializer_class = HostelImageSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    
+    def get_queryset(self):
+        return HostelImage.objects.filter(hostel_id=self.kwargs['hostel_pk']).order_by('-date_created')
+    
+    def get_serializer_context(self):
+        return {'hostel_id':self.kwargs['hostel_pk']}

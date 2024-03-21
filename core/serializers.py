@@ -2,7 +2,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer,
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
-from .models import User, Hostel, Location, Room, Review
+from .models import User, Hostel, Location, Room, Review, HostelImage
 
 
 
@@ -40,20 +40,33 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = ['id','name','hostel_count']
         
         
-
-class HostelSerializer(serializers.ModelSerializer):
-    location = LocationSerializer()
-    room_count = serializers.IntegerField(read_only=True)
+class HostelImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HostelImage
+        fields = ['id','image']
+        
+    def create(self, validated_data):
+        hostel_id = self.context['hostel_id']
+        return HostelImage.objects.create(hostel_id=hostel_id, **validated_data)
     
+    
+    
+class HostelSerializer(serializers.ModelSerializer):
+    location = LocationSerializer(read_only=True)
+    room_count = serializers.IntegerField(read_only=True)
+    images = HostelImageSerializer(many=True,read_only=True)
     class Meta:
         model = Hostel
-        fields = ['id','name','location','description','contact','facilities','room_count',]
+        fields = ['id','name','location','description','contact','facilities','room_count','images']
         
 
+
+
+    
 class HostelCreateSerialzer(serializers.ModelSerializer):
     class Meta:
         model = Hostel
-        fields = ['id','name','location','description','contact','facilities']
+        fields = ['id','name','location','description','contact','facilities',]
         
     
     
@@ -86,3 +99,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         user_id = self.context['user_id']
         hostel_id = self.context['hostel_id']
         return Review.objects.create(hostel_id=hostel_id, user_id=user_id, **validated_data)
+    
+
+
