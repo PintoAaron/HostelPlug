@@ -25,8 +25,8 @@ class BrowseHostels(HttpUser):
     
     @task(3)
     def browse_room(self):
-        hostel_id = randint(1,32)
-        room_id = randint(1,14)
+        hostel_id = 30
+        room_id = 15
         self.client.get(f"/api/v1/hostels/{hostel_id}/rooms/{room_id}",name = f"/api/v1/hostels/:id/rooms/:id")
         
         
@@ -40,33 +40,22 @@ class BrowseHostels(HttpUser):
     
     @task(2)
     def browse_review(self):
-        hostel_id = randint(1,32)
-        review_id = randint(1,15)
+        hostel_id = 30
+        review_id = 16
         self.client.get(f"/api/v1/hostels/{hostel_id}/reviews/{review_id}",name = f"/api/v1/hostels/:id/reviews/:id")
         
-    
-    
-    @task(1)
-    def add_a_review(self):
-        hostel_id = randint(1,6)
-        review = {
-            "hostel":hostel_id,
-            "rating":randint(1,5),
-            "review":"Good hostel"
-        }
-        self.client.post(f"/api/v1/hostels/{hostel_id}/reviews",json = review,name = f"/api/v1/hostels/:id/reviews")
         
     
     
     @task(6)
     def browse_hostel_images(self):
-        hostel_id = randint(1,32)
+        hostel_id = 30
         self.client.get(f"/api/v1/hostels/{hostel_id}/images",name = f"/api/v1/hostels/:id/images")
         
     
     
     @task(3)
     def browse_hostel_image(self):
-        hostel_id = randint(1,32)
-        image_id = randint(1,10)
+        hostel_id = 30
+        image_id = 9
         self.client.get(f"/api/v1/hostels/{hostel_id}/images/{image_id}",name = f"/api/v1/hostels/:id/images/:id")

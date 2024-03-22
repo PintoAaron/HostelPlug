@@ -1,5 +1,7 @@
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -19,6 +21,15 @@ class LocationViewSet(ModelViewSet):
     serializer_class = LocationSerializer
     permission_classes = [IsAdminUser]
     
+    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
+    
+    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+    
 
 class HostelViewSet(ModelViewSet):
     http_method_names = ['get','post','patch','delete','head','options']
@@ -30,6 +41,15 @@ class HostelViewSet(ModelViewSet):
     ordering_fields = ['name','room_count']
     pagination_class = DefaultPagination
     permission_classes = [IsAdminOrReadOnly]
+    
+    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
+    
+    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
     
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -48,11 +68,26 @@ class RoomViewSet(ModelViewSet):
     
     def get_serializer_context(self):
         return {'hostel_id':self.kwargs['hostel_pk']}
+    
+    
+    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
+    
+    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
 
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
+    
+    
+    @method_decorator(cache_page(60*5)) # cache for 5 minutes
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
     
     def get_queryset(self):
         return Review.objects.filter(hostel_id=self.kwargs['hostel_pk']).select_related('user').order_by('-timestamp')
@@ -80,6 +115,14 @@ class ReviewViewSet(ModelViewSet):
 class HostelImageViewSet(ModelViewSet):
     serializer_class = HostelImageSerializer
     permission_classes = [IsAdminOrReadOnly]
+    
+    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
+    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
     
     def get_queryset(self):
         return HostelImage.objects.filter(hostel_id=self.kwargs['hostel_pk']).order_by('-date_created')
