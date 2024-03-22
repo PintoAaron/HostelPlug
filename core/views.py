@@ -23,7 +23,7 @@ class LocationViewSet(ModelViewSet):
 class HostelViewSet(ModelViewSet):
     http_method_names = ['get','post','patch','delete','head','options']
     
-    queryset = Hostel.objects.select_related('location').annotate(room_count=Count('rooms')).order_by('name').all()
+    queryset = Hostel.objects.select_related('location').prefetch_related('rooms','images').annotate(room_count=Count('rooms')).order_by('name').all()
     serializer_class = HostelSerializer
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     search_fields = ['name','location__name']
