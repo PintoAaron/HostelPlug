@@ -13,7 +13,7 @@ from .models import Hostel, Location, Room, Review, HostelImage
 from .permissions import IsAdminOrReadOnly
 from .pagination import DefaultPagination
 from .serializers import HostelSerializer, LocationSerializer, RoomSerializer, HostelCreateSerialzer,ReviewSerializer, HostelImageSerializer
-from utils.upload import upload_image_to_storage_bucket_and_produce_url
+from core.utils import upload
 
 
 
@@ -23,12 +23,12 @@ class LocationViewSet(ModelViewSet):
     serializer_class = LocationSerializer
     permission_classes = [IsAdminUser]
     
-    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    @method_decorator(cache_page(60*5)) # cache for 5 mins
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     
     
-    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    @method_decorator(cache_page(60*5)) # cache for 5 mins
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
     
@@ -37,26 +37,26 @@ class HostelViewSet(ModelViewSet):
     http_method_names = ['get','post','patch','delete','head','options']
     
     queryset = Hostel.objects.select_related('location').prefetch_related('rooms','images').annotate(room_count=Count('rooms')).order_by('name').all()
-    serializer_class = HostelSerializer
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     search_fields = ['name','location__name']
     ordering_fields = ['name','room_count']
     pagination_class = DefaultPagination
     permission_classes = [IsAdminOrReadOnly]
     
-    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    def get_serializer_class(self):
+        if self.request.method in ['POST','PATCH']:
+            return HostelCreateSerialzer
+        return HostelSerializer
+    
+    @method_decorator(cache_page(60*5)) # cache for 5 mins
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     
     
-    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    @method_decorator(cache_page(60*5)) # cache for 5 mins
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
     
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return HostelSerializer
-        return HostelCreateSerialzer
     
     
 
@@ -72,12 +72,12 @@ class RoomViewSet(ModelViewSet):
         return {'hostel_id':self.kwargs['hostel_pk']}
     
     
-    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    @method_decorator(cache_page(60*5)) # cache for 5 mins
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     
     
-    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    @method_decorator(cache_page(60*5)) # cache for 5 mins
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
@@ -112,7 +112,7 @@ class ReviewViewSet(ModelViewSet):
 class HostelImageViewSet(ModelViewSet):
     serializer_class = HostelImageSerializer
     parser_classes = (MultiPartParser, FormParser,)
-    permission_classes = [IsAdminOrReadOnly]
+    #permission_classes = [IsAdminOrReadOnly]
     
     @method_decorator(cache_page(60*60*3)) # cache for 3 hours
     def list(self, request, *args, **kwargs):
@@ -131,7 +131,7 @@ class HostelImageViewSet(ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         file = request.data.get('image')
-        image_url = upload_image_to_storage_bucket_and_produce_url(file)
+        image_url = upload.upload_image_to_storage_bucket_and_produce_url(file)
         request.data['image_url'] = image_url
         
         return super().create(request, *args, **kwargs)

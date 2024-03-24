@@ -47,10 +47,7 @@ class HostelImageSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         hostel_id = self.context['hostel_id']
-        print(validated_data)
         image_url = validated_data.pop('image_url')
-        print("we dey the serializer")
-        print(image_url)
         return HostelImage.objects.create(hostel_id=hostel_id, image_url=image_url)
     
     
