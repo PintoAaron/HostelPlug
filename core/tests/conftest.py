@@ -1,5 +1,5 @@
-from django.contrib.auth.models import User
 from rest_framework.test import APIClient
+from core.models import User
 import pytest
 
 
@@ -11,6 +11,7 @@ def api_client():
 @pytest.fixture
 def authenticate(api_client):
     def do_authenticate(is_staff=False):
-        api_client.force_authenticate(user=User(is_staff=is_staff))
+        user = User.objects.create(is_staff=is_staff)
+        api_client.force_authenticate(user=user)
     return do_authenticate
 

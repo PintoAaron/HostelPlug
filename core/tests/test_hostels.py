@@ -54,7 +54,7 @@ class TestListHostel():
         hostel = baker.make(Hostel)
         response = api_client.get('/api/v1/hostels/')
         assert response.status_code == status.HTTP_200_OK
-        assert response.json().get('results')[0]['name'] == hostel.name
+        assert response.json().get('results')[0]['id'] == hostel.id
     
     
     def test_if_user_is_authenticated_but_not_staff_return_200(self, api_client, authenticate):
@@ -62,7 +62,7 @@ class TestListHostel():
         hostel = baker.make(Hostel)
         response = api_client.get('/api/v1/hostels/')
         assert response.status_code == status.HTTP_200_OK
-        assert response.json().get('results')[0]['name'] == hostel.name
+        assert response.json().get('results')[0]['id'] == hostel.id
     
     
     def test_if_user_is_staff_return_200(self, api_client, authenticate):
@@ -70,7 +70,7 @@ class TestListHostel():
         hostel = baker.make(Hostel)
         response = api_client.get('/api/v1/hostels/')
         assert response.status_code == status.HTTP_200_OK
-        assert response.json().get('results')[0]['name'] == hostel.name
+        assert response.json().get('results')[0]['id'] == hostel.id
         
     
 
@@ -81,7 +81,7 @@ class TestRetriveHostel():
         hostel = baker.make(Hostel)
         response = api_client.get(f'/api/v1/hostels/{hostel.id}/')
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['name'] == hostel.name
+        assert response.data['id'] == hostel.id
         
     
     def test_if_user_is_authenticated_but_not_staff_return_200(self, api_client, authenticate):
@@ -89,7 +89,7 @@ class TestRetriveHostel():
         hostel = baker.make(Hostel)
         response = api_client.get(f'/api/v1/hostels/{hostel.id}/')
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['name'] == hostel.name
+        assert response.data['id'] == hostel.id
         
     
     def test_if_user_is_staff_return_200(self, api_client, authenticate):
@@ -97,12 +97,12 @@ class TestRetriveHostel():
         hostel = baker.make(Hostel)
         response = api_client.get(f'/api/v1/hostels/{hostel.id}/')
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['name'] == hostel.name
+        assert response.data['id'] == hostel.id
         
     
     
     def test_if_hostel_does_not_exist_return_404(self, api_client):
-        response = api_client.get('/api/v1/hostels/1/')
+        response = api_client.get('/api/v1/hostels/100/')
         assert response.status_code == status.HTTP_404_NOT_FOUND
         
     

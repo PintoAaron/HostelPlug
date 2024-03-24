@@ -50,8 +50,8 @@ class TestListLocations():
         location = baker.make(Location)
         response = api_client.get('/api/v1/locations/')
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]['name'] == location.name
-    
+        assert response.data[0]['id'] == location.id
+            
 
 
 @pytest.mark.django_db
@@ -74,7 +74,7 @@ class TestRetriveLocation():
         location = baker.make(Location)
         response = api_client.get(f'/api/v1/locations/{location.id}/')
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['name'] == location.name
+        assert response.data['id'] == location.id
         
     
     
