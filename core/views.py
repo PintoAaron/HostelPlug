@@ -7,11 +7,13 @@ from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser,IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .models import Hostel, Location, Room, Review, HostelImage
 from .permissions import IsAdminOrReadOnly
 from .pagination import DefaultPagination
 from .serializers import HostelSerializer, LocationSerializer, RoomSerializer, HostelCreateSerialzer,ReviewSerializer, HostelImageSerializer
+from utils.upload import upload_image_to_storage_bucket_and_produce_url
 
 
 
@@ -84,11 +86,7 @@ class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
     
-    
-    @method_decorator(cache_page(60*5)) # cache for 5 minutes
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-    
+
     def get_queryset(self):
         return Review.objects.filter(hostel_id=self.kwargs['hostel_pk']).select_related('user').order_by('-timestamp')
     
@@ -107,13 +105,13 @@ class ReviewViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         review = self.get_object()
         if review.user != request.user:
-            print('You do not have permission to perform this action')
             return Response({'detail':'You do not have permission to delete this post'},status=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs) 
         
 
 class HostelImageViewSet(ModelViewSet):
     serializer_class = HostelImageSerializer
+    parser_classes = (MultiPartParser, FormParser,)
     permission_classes = [IsAdminOrReadOnly]
     
     @method_decorator(cache_page(60*60*3)) # cache for 3 hours
@@ -129,3 +127,13 @@ class HostelImageViewSet(ModelViewSet):
     
     def get_serializer_context(self):
         return {'hostel_id':self.kwargs['hostel_pk']}
+    
+    
+    def create(self, request, *args, **kwargs):
+        file = request.data.get('image')
+        image_url = upload_image_to_storage_bucket_and_produce_url(file)
+        request.data['image_url'] = image_url
+        
+        return super().create(request, *args, **kwargs)
+
+        

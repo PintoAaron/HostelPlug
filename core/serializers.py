@@ -43,11 +43,15 @@ class LocationSerializer(serializers.ModelSerializer):
 class HostelImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = HostelImage
-        fields = ['id','image']
+        fields = ['id','image_url']
         
     def create(self, validated_data):
         hostel_id = self.context['hostel_id']
-        return HostelImage.objects.create(hostel_id=hostel_id, **validated_data)
+        print(validated_data)
+        image_url = validated_data.pop('image_url')
+        print("we dey the serializer")
+        print(image_url)
+        return HostelImage.objects.create(hostel_id=hostel_id, image_url=image_url)
     
     
     

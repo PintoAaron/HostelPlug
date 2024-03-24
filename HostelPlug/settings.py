@@ -13,6 +13,13 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
+import firebase_admin
+from firebase_admin import credentials, storage
+
+
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -181,3 +188,13 @@ CACHES = {
         }
     }
 }
+
+
+FIREBASE_SERVICE_ACCOUNT_KEY = os.getenv('PATH_TO_FIREBASE_SERVICE_ACCOUNT_KEY')
+FIREBASE_BUCKET = os.getenv('FIREBASE_BUCKET')
+
+
+cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_KEY)
+firebase_admin.initialize_app(cred, {
+    'storageBucket': FIREBASE_BUCKET
+})
