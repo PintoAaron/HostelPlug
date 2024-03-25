@@ -221,3 +221,30 @@ cred = credentials.Certificate(FIREBASE_CONFIG)
 firebase_admin.initialize_app(cred, {
     'storageBucket': FIREBASE_BUCKET
 })
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'general.log',
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console','file'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': True,
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} ({levelname}) - {name} - {message}',
+            'style': '{',
+        }
+    }
+}

@@ -18,6 +18,7 @@ class AppSettings(BaseSettings):
     FIREBASE_CLIENT_X509_CERT_URL : str
     FIREBASE_UNIVERSE_DOMAIN : str
     FIREBASE_BUCKET :str
+    DJANGO_LOG_LEVEL : str
     
     class Config:
         env_file = ".env"
