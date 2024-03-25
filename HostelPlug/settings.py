@@ -17,7 +17,9 @@ from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, storage
 
+from core.utils import config
 
+setting = config.AppSettings()
 
 load_dotenv()
 
@@ -102,19 +104,15 @@ WSGI_APPLICATION = 'HostelPlug.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DB_HOST= os.getenv('DB_HOST')
-DB_USER=os.getenv('DB_USER')
-DB_PASSWORD=os.getenv('DB_PASSWORD')
-DB_NAME=os.getenv('DB_NAME')
 
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': DB_NAME,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
-        'HOST': DB_HOST,
+        'NAME': setting.DB_NAME,
+        'HOST': setting.DB_HOST,
+        'USER': setting.DB_USER,
+        'PASSWORD': setting.DB_PASSWORD,
     }
 }
 
@@ -198,12 +196,26 @@ CACHES = {
     }
 }
 
+FIREBASE_CONFIG = {  
+  "type":setting.FIREBASE_TYPE.replace('"', '').replace(',', ''),
+  "project_id":setting.FIREBASE_PROJECT_ID.replace('"', '').replace(',', ''),
+  "private_key_id": setting.FIREBASE_PRIVATE_KEY_ID.replace('"', '').replace(',', ''),
+  "private_key": setting.FIREBASE_PRIVATE_KEY.replace('"', '').replace(',', '').replace('\\n', '\n'),
+  "client_email": setting.FIREBASE_CLIENT_EMAIL.replace('"', '').replace(',', ''),
+  "client_id": setting.FIREBASE_CLIENT_ID.replace('"', '').replace(',', ''),
+  "auth_uri": setting.FIREBASE_AUTH_URI.replace('"', '').replace(',', ''),
+  "token_uri": setting.FIREBASE_TOKEN_URI.replace('"', '').replace(',', ''),
+  "auth_provider_x509_cert_url": setting.FIREBASE_AUTH_PROVIDER_X509_CERT_URL.replace('"', '').replace(',', ''),
+  "client_x509_cert_url": setting.FIREBASE_CLIENT_X509_CERT_URL.replace('"', '').replace(',', ''),
+  "universe_domain": setting.FIREBASE_UNIVERSE_DOMAIN.replace('"', '').replace(',', '')
+  
+}
 
-FIREBASE_SERVICE_ACCOUNT_KEY = os.getenv('PATH_TO_FIREBASE_SERVICE_ACCOUNT_KEY')
-FIREBASE_BUCKET = os.getenv('FIREBASE_BUCKET')
+
+FIREBASE_BUCKET = setting.FIREBASE_BUCKET
 
 
-cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_KEY)
+cred = credentials.Certificate(FIREBASE_CONFIG)
 firebase_admin.initialize_app(cred, {
     'storageBucket': FIREBASE_BUCKET
 })
