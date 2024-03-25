@@ -1,3 +1,4 @@
+from django.views.generic import TemplateView
 from django.urls import path,include
 from rest_framework_nested import routers
 from . import views
@@ -17,7 +18,8 @@ hostel_router.register('images',views.HostelImageViewSet,basename='hostel-images
 
 urlpatterns = [
     
-    path('', include(router.urls)),
-    path('',include(hostel_router.urls)),
+    path('api/v1/', include(router.urls)),
+    path('api/v1/',include(hostel_router.urls)),
+    path('', TemplateView.as_view(template_name='core/index.html')),
     
 ]
