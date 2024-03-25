@@ -13,6 +13,15 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
+import firebase_admin
+from firebase_admin import credentials, storage
+
+from core.utils import config
+
+setting = config.AppSettings()
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -95,10 +104,15 @@ WSGI_APPLICATION = 'HostelPlug.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': setting.DB_NAME,
+        'HOST': setting.DB_HOST,
+        'USER': setting.DB_USER,
+        'PASSWORD': setting.DB_PASSWORD,
     }
 }
 
@@ -170,3 +184,38 @@ DJOSER = {
         'user': 'core.serializers.UserSerializer',
     },
 }
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+FIREBASE_CONFIG = {  
+  "type":setting.FIREBASE_TYPE.replace('"', '').replace(',', ''),
+  "project_id":setting.FIREBASE_PROJECT_ID.replace('"', '').replace(',', ''),
+  "private_key_id": setting.FIREBASE_PRIVATE_KEY_ID.replace('"', '').replace(',', ''),
+  "private_key": setting.FIREBASE_PRIVATE_KEY.replace('"', '').replace(',', '').replace('\\n', '\n'),
+  "client_email": setting.FIREBASE_CLIENT_EMAIL.replace('"', '').replace(',', ''),
+  "client_id": setting.FIREBASE_CLIENT_ID.replace('"', '').replace(',', ''),
+  "auth_uri": setting.FIREBASE_AUTH_URI.replace('"', '').replace(',', ''),
+  "token_uri": setting.FIREBASE_TOKEN_URI.replace('"', '').replace(',', ''),
+  "auth_provider_x509_cert_url": setting.FIREBASE_AUTH_PROVIDER_X509_CERT_URL.replace('"', '').replace(',', ''),
+  "client_x509_cert_url": setting.FIREBASE_CLIENT_X509_CERT_URL.replace('"', '').replace(',', ''),
+  "universe_domain": setting.FIREBASE_UNIVERSE_DOMAIN.replace('"', '').replace(',', '')
+  
+}
+
+
+FIREBASE_BUCKET = setting.FIREBASE_BUCKET
+
+
+cred = credentials.Certificate(FIREBASE_CONFIG)
+firebase_admin.initialize_app(cred, {
+    'storageBucket': FIREBASE_BUCKET
+})

@@ -28,7 +28,7 @@ class Hostel(models.Model):
 
 class HostelImage(models.Model):
     hostel = models.ForeignKey(Hostel, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='hostels/images',null=False,validators=[validate_file_size])
+    image_url = models.URLField(null=True,blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
 
 
