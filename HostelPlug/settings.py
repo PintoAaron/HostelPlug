@@ -17,10 +17,6 @@ from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, storage
 
-from core.utils import config
-
-setting = config.AppSettings()
-
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -107,13 +103,15 @@ WSGI_APPLICATION = 'HostelPlug.wsgi.application'
 
 
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': setting.DB_NAME,
-        'HOST': setting.DB_HOST,
-        'USER': setting.DB_USER,
-        'PASSWORD': setting.DB_PASSWORD,
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'HOST': os.getenv('DB_HOST'),
+        'USER': os.getenv('DB_USER'),
+        'PORT': os.getenv('DB_PORT'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
     }
 }
 
@@ -199,23 +197,21 @@ CACHES = {
 }
 
 FIREBASE_CONFIG = {  
-  "type":setting.FIREBASE_TYPE.replace('"', '').replace(',', ''),
-  "project_id":setting.FIREBASE_PROJECT_ID.replace('"', '').replace(',', ''),
-  "private_key_id": setting.FIREBASE_PRIVATE_KEY_ID.replace('"', '').replace(',', ''),
-  "private_key": setting.FIREBASE_PRIVATE_KEY.replace('"', '').replace(',', '').replace('\\n', '\n'),
-  "client_email": setting.FIREBASE_CLIENT_EMAIL.replace('"', '').replace(',', ''),
-  "client_id": setting.FIREBASE_CLIENT_ID.replace('"', '').replace(',', ''),
-  "auth_uri": setting.FIREBASE_AUTH_URI.replace('"', '').replace(',', ''),
-  "token_uri": setting.FIREBASE_TOKEN_URI.replace('"', '').replace(',', ''),
-  "auth_provider_x509_cert_url": setting.FIREBASE_AUTH_PROVIDER_X509_CERT_URL.replace('"', '').replace(',', ''),
-  "client_x509_cert_url": setting.FIREBASE_CLIENT_X509_CERT_URL.replace('"', '').replace(',', ''),
-  "universe_domain": setting.FIREBASE_UNIVERSE_DOMAIN.replace('"', '').replace(',', '')
+  "type":os.getenv('FIREBASE_TYPE'),
+  "project_id":os.getenv('FIREBASE_PROJECT_ID'),
+  "private_key_id": os.getenv('FIREBASE_PRIVATE_KEY_ID'),
+  "private_key": os.getenv('FIREBASE_PRIVATE_KEY').replace('\\n', '\n'),
+  "client_email": os.getenv('FIREBASE_CLIENT_EMAIL'),
+  "client_id": os.getenv('FIREBASE_CLIENT_ID'),
+  "auth_uri": os.getenv('FIREBASE_AUTH_URI'),
+  "token_uri": os.getenv('FIREBASE_TOKEN_URI'),
+  "auth_provider_x509_cert_url": os.getenv('FIREBASE_AUTH_PROVIDER_X509_CERT_URL'),
+  "client_x509_cert_url": os.getenv('FIREBASE_CLIENT_X509_CERT_URL'),
+  "universe_domain": os.getenv('FIREBASE_UNIVERSE_DOMAIN')
   
 }
 
-
-FIREBASE_BUCKET = setting.FIREBASE_BUCKET
-
+FIREBASE_BUCKET = os.getenv('FIREBASE_BUCKET')
 
 cred = credentials.Certificate(FIREBASE_CONFIG)
 firebase_admin.initialize_app(cred, {
