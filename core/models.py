@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-from .validators import validate_file_size
 
 
 
@@ -18,6 +17,8 @@ class Hostel(models.Model):
     description = models.TextField(null=True,blank=True)
     contact = models.CharField(max_length=15,null=True)
     facilities = models.TextField(blank=True,null=True)
+    longitude = models.FloatField(null=True,default=6.67474)
+    latitude = models.FloatField(null=True,default=-1.57160)
 
     def __str__(self):
         return self.name

@@ -58,7 +58,7 @@ class HostelSerializer(serializers.ModelSerializer):
     images = HostelImageSerializer(many=True,read_only=True)
     class Meta:
         model = Hostel
-        fields = ['id','name','location','description','contact','facilities','room_count','images']
+        fields = ['id','name','location','description','contact','facilities','room_count','images','longitude','latitude']
         
 
 
@@ -67,7 +67,7 @@ class HostelSerializer(serializers.ModelSerializer):
 class HostelCreateSerialzer(serializers.ModelSerializer):
     class Meta:
         model = Hostel
-        fields = ['id','name','location','description','contact','facilities',]
+        fields = ['id','name','location','description','contact','facilities','longitude','latitude']
         
     
     
