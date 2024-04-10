@@ -20,7 +20,6 @@ ConfigArgParse==1.7
 coverage==7.4.0
 cryptography==42.0.3
 defusedxml==0.8.0rc2
-dj-database-url==2.1.0
 Django==4.2.10
 django-cors-headers==4.3.1
 django-filter==23.5
@@ -59,12 +58,9 @@ itsdangerous==2.1.2
 Jinja2==3.1.3
 kombu==5.3.5
 MarkupSafe==2.1.5
-model-bakery==1.17.0
 msgpack==1.0.8
-mysqlclient==2.2.4
 oauthlib==3.2.2
 packaging==23.2
-pillow==10.2.0
 pluggy==1.3.0
 prometheus_client==0.20.0
 prompt-toolkit==3.0.43
@@ -82,8 +78,6 @@ pydantic_core==2.16.3
 PyJWT==2.8.0
 pyparsing==3.1.2
 pytest==7.4.4
-pytest-cov==4.1.0
-pytest-django==4.7.0
 python-dateutil==2.8.2
 python-dotenv==1.0.1
 python3-openid==3.2.0

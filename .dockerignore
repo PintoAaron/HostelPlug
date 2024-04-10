@@ -1,0 +1,10 @@
+media/
+virt/
+static/
+db.sqlite3
+.vscode
+.github
+.coverage
+__pycache__
+media
+general.log
