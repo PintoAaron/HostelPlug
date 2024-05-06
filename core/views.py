@@ -23,12 +23,12 @@ class LocationViewSet(ModelViewSet):
     serializer_class = LocationSerializer
     permission_classes = [IsAdminUser]
     
-    @method_decorator(cache_page(60*5)) # cache for 5 mins
+    #@method_decorator(cache_page(60*5)) # cache for 5 mins
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     
     
-    @method_decorator(cache_page(60*5)) # cache for 5 mins
+    #@method_decorator(cache_page(60*5)) # cache for 5 mins
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
     
@@ -48,12 +48,12 @@ class HostelViewSet(ModelViewSet):
             return HostelCreateSerialzer
         return HostelSerializer
     
-    @method_decorator(cache_page(60*5)) # cache for 5 mins
+    #@method_decorator(cache_page(60*5)) # cache for 5 mins
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     
     
-    @method_decorator(cache_page(60*5)) # cache for 5 mins
+    #@method_decorator(cache_page(60*5)) # cache for 5 mins
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
     
@@ -72,12 +72,12 @@ class RoomViewSet(ModelViewSet):
         return {'hostel_id':self.kwargs['hostel_pk']}
     
     
-    @method_decorator(cache_page(60*5)) # cache for 5 mins
+    #@method_decorator(cache_page(60*5)) # cache for 5 mins
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     
     
-    @method_decorator(cache_page(60*5)) # cache for 5 mins
+    #@method_decorator(cache_page(60*5)) # cache for 5 mins
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
@@ -114,11 +114,11 @@ class HostelImageViewSet(ModelViewSet):
     parser_classes = (MultiPartParser, FormParser,)
     #permission_classes = [IsAdminOrReadOnly]
     
-    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    #@method_decorator(cache_page(60*60*3)) # cache for 3 hours
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     
-    @method_decorator(cache_page(60*60*3)) # cache for 3 hours
+    #@method_decorator(cache_page(60*60*3)) # cache for 3 hours
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
     
@@ -132,6 +132,8 @@ class HostelImageViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         file = request.data.get('image')
         image_url = upload.upload_image_to_storage_bucket_and_produce_url(file)
+        if not image_url:
+            raise ValueError('IMage upload failed')
         request.data['image_url'] = image_url
         
         return super().create(request, *args, **kwargs)
