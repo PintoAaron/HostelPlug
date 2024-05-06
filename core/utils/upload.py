@@ -13,8 +13,8 @@ def upload_image_to_storage_bucket_and_produce_url(file):
         blob.upload_from_file(file.file)
 
         blob.make_public()
-        logger.info(f"Success - Image uploaded to {blob.public_url}")
+        logger.info(f"Success - Image uploaded to storage")
         return blob.public_url
     except Exception as e:
-        logger.error(f"Error - failed to upload image{e}")
+        logger.error(f"Error - failed to upload image to storage: {e}")
         return False
