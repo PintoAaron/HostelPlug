@@ -54,6 +54,12 @@ class Room(models.Model):
 
 class User(AbstractUser):
     phone = models.CharField(max_length=15,null=False)
+    email = models.EmailField(unique=True)
+    
+    
+    
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
     
     def __str__(self):
         return self.username

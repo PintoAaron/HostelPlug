@@ -9,7 +9,7 @@ from .models import User, Hostel, Location, Room, Review, HostelImage
 
 class UserCreateSerializer(BaseUserCreateSerializer):
     class Meta(BaseUserCreateSerializer.Meta):
-        fields = ['id','username','password','phone']
+        fields = ['id','email','username','password']
         
         
     def save(self, **kwargs):
@@ -22,7 +22,7 @@ class UserCreateSerializer(BaseUserCreateSerializer):
 class UserSerializer(BaseUserSerializer):
     
     class Meta(BaseUserSerializer.Meta):
-        fields = ['id','username','phone']
+        fields = ['id','email','username','phone']
 
 
 class SimpleUserSerializer(serializers.ModelSerializer):
