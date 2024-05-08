@@ -2,10 +2,13 @@ from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer,
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from rest_framework import serializers
+import logging
 
 from .models import User, Hostel, Location, Room, Review, HostelImage, CartItem, Cart, BookingItem,Booking
 
 
+
+logger = logging.getLogger(__name__)
 
 
 class UserCreateSerializer(BaseUserCreateSerializer):
@@ -227,20 +230,24 @@ class CreateBookingSerializer(serializers.Serializer):
             
             booking = Booking.objects.create(user_id=user_id)
             cart_items = CartItem.objects.select_related('room').filter(cart_id=cart_id)
-            booking_items = [
-                BookingItem(booking=booking,
-                            room=item.room,
-                            quantity=item.quantity,)
-                for item in cart_items
-            ]
-            
-            # Update available beds
-            for item in cart_items:
-                item.room.available_beds -= item.quantity
-                item.room.save()
-            
-            BookingItem.objects.bulk_create(booking_items)
-            
-            Cart.objects.filter(pk=cart_id).delete()
-            
-            return booking
+            try:
+                booking_items = [
+                    BookingItem(booking=booking,
+                                room=item.room,
+                                quantity=item.quantity,)
+                    for item in cart_items
+                ]
+                
+                # Update available beds
+                for item in cart_items:
+                    item.room.available_beds -= item.quantity
+                    item.room.save()
+                
+                BookingItem.objects.bulk_create(booking_items)
+                
+                Cart.objects.filter(pk=cart_id).delete()
+                
+                return booking
+            except Exception as e:
+                logger.error(f"Error: create booking - {e}")
+                raise serializers.ValidationError("Error booking room")
