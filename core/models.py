@@ -97,3 +97,30 @@ class CartItem(models.Model):
     
     class Meta:
         unique_together = ['cart','room']
+        
+        
+
+
+class Booking(models.Model):
+    
+    PAYMENT_PENDING = "P"
+    PAYMENT_COMPLETE = "C"
+    PAYMENT_FAILED = "F"
+    
+    STATUS = [(PAYMENT_PENDING, 'Pending'),
+              (PAYMENT_COMPLETE, 'Complete'),
+              (PAYMENT_FAILED, 'Failed')]
+    
+    user = models.ForeignKey(User, related_name='bookings', on_delete=models.PROTECT)
+    payment_status = models.CharField(max_length=1, choices= STATUS, default=PAYMENT_PENDING)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-timestamp']
+    
+
+class BookingItem(models.Model):
+    booking = models.ForeignKey(Booking, related_name='bookingitems', on_delete=models.PROTECT)
+    room = models.ForeignKey(Room, related_name='bookingitems', on_delete=models.PROTECT)
+    quantity = models.PositiveSmallIntegerField(default=1,validators=[MinValueValidator(1)])
+  

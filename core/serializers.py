@@ -1,8 +1,9 @@
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer, UserSerializer as BaseUserSerializer
 from django.contrib.auth.hashers import make_password
+from django.db import transaction
 from rest_framework import serializers
 
-from .models import User, Hostel, Location, Room, Review, HostelImage, CartItem, Cart
+from .models import User, Hostel, Location, Room, Review, HostelImage, CartItem, Cart, BookingItem,Booking
 
 
 
@@ -178,3 +179,62 @@ class CartSerializer(serializers.ModelSerializer):
     def get_total_price(self, obj: Cart):
         return sum([item.room.price * item.quantity for item in obj.items.all()])
     
+    
+
+class BookingItemSerializer(serializers.ModelSerializer):
+    room = RoomSerializer(read_only=True)
+    class Meta:
+        model = BookingItem
+        fields = ['id','room','quantity','total_price']
+        
+    total_price = serializers.SerializerMethodField()
+    
+    
+    def get_total_price(self, obj: BookingItem):
+        return obj.room.price * obj.quantity
+        
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    bookingitems = BookingItemSerializer(many=True, read_only=True)
+    class Meta:
+        model = Booking
+        fields = ['id','user','bookingitems','payment_status','timestamp','total_price']
+        
+    total_price = serializers.SerializerMethodField()
+    
+    def get_total_price(self, obj: Booking):
+        return sum([item.room.price * item.quantity for item in obj.bookingitems.all()])
+
+
+
+
+class CreateBookingSerializer(serializers.Serializer):
+    cart_id = serializers.UUIDField()
+    
+    def validate_cart_id(self, value):
+        if not Cart.objects.filter(pk=value).exists():
+            raise serializers.ValidationError("Invalid Cart ID")
+        elif CartItem.objects.filter(cart_id=value).count() == 0:
+            raise serializers.ValidationError("Cart is empty")
+        return value
+    
+    
+    def save(self, **kwargs):
+        with transaction.atomic():
+            user_id = self.context['user_id']
+            cart_id = self.validated_data['cart_id']
+            
+            booking = Booking.objects.create(user_id=user_id)
+            cart_items = CartItem.objects.select_related('room').filter(cart_id=cart_id)
+            booking_items = [
+                BookingItem(booking=booking,
+                            room=item.room,
+                            quantity=item.quantity,)
+                for item in cart_items
+            ]
+            BookingItem.objects.bulk_create(booking_items)
+            
+            Cart.objects.filter(pk=cart_id).delete()
+            
+            return booking

@@ -8,6 +8,7 @@ router = routers.DefaultRouter()
 router.register('hostels',views.HostelViewSet,basename='hostels')
 router.register('locations',views.LocationViewSet)
 router.register('carts',views.CartViewSet,basename='carts')
+router.register('bookings',views.BookingViewSet,basename='bookings')
 
 
 hostel_router = routers.NestedDefaultRouter(router,'hostels',lookup='hostel')

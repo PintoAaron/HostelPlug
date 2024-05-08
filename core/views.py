@@ -10,10 +10,10 @@ from rest_framework.permissions import IsAdminUser,IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 
-from .models import Hostel, Location, Room, Review, HostelImage,CartItem, Cart
+from .models import Hostel, Location, Room, Review, HostelImage,CartItem, Cart, Booking
 from .permissions import IsAdminOrReadOnly
 from .pagination import DefaultPagination
-from .serializers import HostelSerializer, LocationSerializer, RoomSerializer, HostelCreateSerialzer,ReviewSerializer, HostelImageSerializer,CartItemSerializer,CreateCartItemSerializer,CartSerializer,UpdateCartItemSerializer
+from .serializers import HostelSerializer, LocationSerializer, RoomSerializer, HostelCreateSerialzer,ReviewSerializer, HostelImageSerializer,CartItemSerializer,CreateCartItemSerializer,CartSerializer,UpdateCartItemSerializer,BookingItemSerializer,BookingSerializer,CreateBookingSerializer
 from core.utils import upload
 
 
@@ -168,5 +168,30 @@ class CartItemViewSet(ModelViewSet):
     
     
     
+
+class BookingViewSet(ModelViewSet):
+    http_method_names = ['get','post','patch','delete','head','options']
+    
+    def get_permissions(self):
+        if self.request.method in ['PATCH','DELETE']:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateBookingSerializer
+        return BookingSerializer
     
     
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return Booking.objects.prefetch_related('bookingitems__room').all()
+        return Booking.objects.prefetch_related('bookingitems__room').filter(user_id=self.request.user.id)
+    
+    
+    def create(self, request, *args, **kwargs):
+        serializer = CreateBookingSerializer(data=request.data, context={'user_id':self.request.user.id})
+        serializer.is_valid(raise_exception=True)
+        bookings = serializer.save()
+        serializer = BookingSerializer(bookings)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
