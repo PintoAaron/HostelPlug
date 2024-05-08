@@ -5,14 +5,15 @@ from django.views.decorators.cache import cache_page
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from rest_framework.permissions import IsAdminUser,IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 
-from .models import Hostel, Location, Room, Review, HostelImage
+from .models import Hostel, Location, Room, Review, HostelImage,CartItem, Cart
 from .permissions import IsAdminOrReadOnly
 from .pagination import DefaultPagination
-from .serializers import HostelSerializer, LocationSerializer, RoomSerializer, HostelCreateSerialzer,ReviewSerializer, HostelImageSerializer
+from .serializers import HostelSerializer, LocationSerializer, RoomSerializer, HostelCreateSerialzer,ReviewSerializer, HostelImageSerializer,CartItemSerializer,CreateCartItemSerializer,CartSerializer,UpdateCartItemSerializer
 from core.utils import upload
 
 
@@ -137,5 +138,35 @@ class HostelImageViewSet(ModelViewSet):
         request.data['image_url'] = image_url
         
         return super().create(request, *args, **kwargs)
+    
 
-        
+
+class CartViewSet(CreateModelMixin,RetrieveModelMixin,DestroyModelMixin,GenericViewSet):
+    serializer_class = CartSerializer
+    queryset = Cart.objects.prefetch_related('items__room').all()
+
+
+
+
+class CartItemViewSet(ModelViewSet):
+    
+    http_method_names = ['get','post','patch','delete']
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateCartItemSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateCartItemSerializer
+        return CartItemSerializer
+    
+    def get_queryset(self):
+        return CartItem.objects.select_related('room').filter(cart_id=self.kwargs['cart_pk'])
+    
+    
+    def get_serializer_context(self):
+        return {'cart_id':self.kwargs['cart_pk']}
+    
+    
+    
+    
+    

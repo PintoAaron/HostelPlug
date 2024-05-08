@@ -2,7 +2,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer,
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
-from .models import User, Hostel, Location, Room, Review, HostelImage
+from .models import User, Hostel, Location, Room, Review, HostelImage, CartItem, Cart
 
 
 
@@ -103,3 +103,78 @@ class ReviewSerializer(serializers.ModelSerializer):
     
 
 
+class CartItemSerializer(serializers.ModelSerializer):
+    room = RoomSerializer(read_only=True)
+    class Meta:
+        model = CartItem
+        fields = ['id','room','quantity','total_price']
+        
+    total_price = serializers.SerializerMethodField()
+    
+    
+    def get_total_price(self, obj: CartItem):
+        return obj.room.price * obj.quantity
+    
+    
+    
+    
+
+class CreateCartItemSerializer(serializers.ModelSerializer):
+    room_id = serializers.IntegerField()
+    class Meta:
+        model = CartItem
+        fields = ['id','room_id','quantity']
+        
+    def validate_room_id(self, value):
+        if not Room.objects.filter(pk=value).exists():
+            raise serializers.ValidationError("Invalid Room ID")
+        return value
+        
+    def validate(self, data):
+        room = Room.objects.get(id=data['room_id'])
+        if data['quantity'] > room.available_beds:
+            raise serializers.ValidationError("Not enough beds available")
+        return data
+    
+    
+    def save(self, **kwargs):
+        cart_id = self.context['cart_id']
+        room_id = self.validated_data['room_id']
+        quantity = self.validated_data['quantity']
+        
+        try:
+            cart_item = CartItem.objects.get(cart_id=cart_id, room_id=room_id)
+            cart_item.quantity += quantity
+            cart_item.save()
+            self.instance = cart_item
+        except CartItem.DoesNotExist:
+            self.instance = CartItem.objects.create(cart_id=cart_id, **self.validated_data)
+        
+        return self.instance
+
+
+
+class UpdateCartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['quantity']
+        
+    def validate(self, data):
+        if data['quantity'] > data['room'].available_beds:
+            raise serializers.ValidationError("Not enough beds available")
+        return data
+
+
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = ['id','items','total_price']
+        
+    id = serializers.StringRelatedField(read_only=True)
+    items = CartItemSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField()
+    
+    
+    def get_total_price(self, obj: Cart):
+        return sum([item.room.price * item.quantity for item in obj.items.all()])
+    

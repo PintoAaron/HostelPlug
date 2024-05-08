@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator
+import uuid
 
 
 
@@ -79,3 +81,19 @@ class Review(models.Model):
     
     def __str__(self):
         return f"{self.hostel.name} - {self.user.username} - {self.rating}"
+    
+
+
+class Cart(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, related_name='cartitems', on_delete=models.CASCADE)
+    quantity = models.PositiveSmallIntegerField(default=1,validators=[MinValueValidator(1)])
+    
+    
+    class Meta:
+        unique_together = ['cart','room']
