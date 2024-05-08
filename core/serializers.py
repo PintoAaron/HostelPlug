@@ -233,6 +233,12 @@ class CreateBookingSerializer(serializers.Serializer):
                             quantity=item.quantity,)
                 for item in cart_items
             ]
+            
+            # Update available beds
+            for item in cart_items:
+                item.room.available_beds -= item.quantity
+                item.room.save()
+            
             BookingItem.objects.bulk_create(booking_items)
             
             Cart.objects.filter(pk=cart_id).delete()
