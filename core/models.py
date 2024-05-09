@@ -47,7 +47,7 @@ class Room(models.Model):
     hostel = models.ForeignKey(Hostel, related_name='rooms', on_delete=models.CASCADE)
     capacity = models.CharField(max_length=10, choices=CAPACITY_CHOICES, default=FOUR_IN_ONE)
     price = models.DecimalField(max_digits=8, decimal_places=2,null=True)
-    available_beds = models.IntegerField(default=0)
+    available_beds = models.IntegerField(default=0,validators=[MinValueValidator(0)])
     
     def __str__(self):
         return f"{self.capacity}@{self.hostel.name}"

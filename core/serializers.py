@@ -43,6 +43,18 @@ class LocationSerializer(serializers.ModelSerializer):
         model = Location
         fields = ['id','name','hostel_count']
         
+    
+    def validate(self,data):
+        if Location.objects.filter(name=data['name']).exists():
+            raise serializers.ValidationError("Location already exists")
+        return data
+    
+    def create(self, validated_data):
+        validated_data['name'] = validated_data['name'].title()
+        return Location.objects.create(**validated_data)
+    
+    
+        
         
 class HostelImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -72,7 +84,11 @@ class HostelCreateSerialzer(serializers.ModelSerializer):
     class Meta:
         model = Hostel
         fields = ['id','name','location','description','contact','facilities','longitude','latitude']
-        
+    
+    
+    def create(self, validated_data):
+        validated_data['name'] = validated_data['name'].title()
+        return Hostel.objects.create(**validated_data)
     
     
     
@@ -80,6 +96,13 @@ class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = ['id','capacity','price','available_beds']
+        
+    
+    def validate(self, data):
+        head_count = int(data['capacity'][0])
+        if data['available_beds'] > head_count:
+            raise serializers.ValidationError(f"Available beds cannot be more than {head_count}")
+        return data
         
     
     def create(self, validated_data):
