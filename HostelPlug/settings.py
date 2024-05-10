@@ -16,6 +16,7 @@ from datetime import timedelta
 from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, storage
+from celery.schedules import crontab
 
 load_dotenv()
 
@@ -236,5 +237,25 @@ LOGGING = {
             'format': '{asctime} ({levelname}) - {name} - {message}',
             'style': '{',
         }
+    }
+}
+
+
+
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT='587'
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
+
+
+
+CELERY_BROKER_URL=os.getenv('BROKER_URL')
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BEAT_SCHEDULE={
+    'mail_clients_every_friday':{
+        'task':'core.mail.tasks.mail_clients_every_friday',
+        'schedule': crontab(hour=6, minute=54, day_of_week=1)
     }
 }

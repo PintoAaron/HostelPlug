@@ -7,3 +7,6 @@ db.sqlite3
 .coverage
 general.log
 static
+celerybeat-schedule.bak
+celerybeat-schedule.dat
+celerybeat-schedule.dir

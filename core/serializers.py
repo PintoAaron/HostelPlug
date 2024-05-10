@@ -2,6 +2,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer,
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from rest_framework import serializers
+from core.signals import hostel_booked_signal
 import logging
 
 from .models import User, Hostel, Location, Room, Review, HostelImage, CartItem, Cart, BookingItem,Booking
@@ -43,6 +44,18 @@ class LocationSerializer(serializers.ModelSerializer):
         model = Location
         fields = ['id','name','hostel_count']
         
+    
+    def validate(self,data):
+        if Location.objects.filter(name=data['name']).exists():
+            raise serializers.ValidationError("Location already exists")
+        return data
+    
+    def create(self, validated_data):
+        validated_data['name'] = validated_data['name'].title()
+        return Location.objects.create(**validated_data)
+    
+    
+        
         
 class HostelImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -72,14 +85,26 @@ class HostelCreateSerialzer(serializers.ModelSerializer):
     class Meta:
         model = Hostel
         fields = ['id','name','location','description','contact','facilities','longitude','latitude']
-        
+    
+    
+    def create(self, validated_data):
+        validated_data['name'] = validated_data['name'].title()
+        return Hostel.objects.create(**validated_data)
     
     
     
 class RoomSerializer(serializers.ModelSerializer):
+    hostel_id = serializers.IntegerField(read_only=True)
     class Meta:
         model = Room
-        fields = ['id','capacity','price','available_beds']
+        fields = ['id','hostel_id','capacity','price','available_beds']
+        
+    
+    def validate(self, data):
+        head_count = int(data['capacity'][0])
+        if data['available_beds'] > head_count:
+            raise serializers.ValidationError(f"Available beds cannot be more than {head_count}")
+        return data
         
     
     def create(self, validated_data):
@@ -246,6 +271,9 @@ class CreateBookingSerializer(serializers.Serializer):
                 BookingItem.objects.bulk_create(booking_items)
                 
                 Cart.objects.filter(pk=cart_id).delete()
+                
+                logger.info(f"Booking created  - sending signal")
+                hostel_booked_signal.send_robust(sender=self.__class__, booking=booking)
                 
                 return booking
             except Exception as e:
