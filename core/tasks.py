@@ -1,7 +1,7 @@
 from django.core.mail import EmailMessage,BadHeaderError
 from core.models import User
 from celery import shared_task
-from core.models import User , Hostel
+from core.models import User , Hostel, Booking
 import logging
 
 
@@ -11,24 +11,27 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def hostel_booked_task(**kwargs):
+def hostel_booked_task(booking_id):
     print("Inside hostel_booked_task..................")
-    print(kwargs)
-    if kwargs['booking']:
-        booking = kwargs['booking']
-        username, email = User.objects.filter(pk=booking['user']).values_list('username', 'email').first()
-        items = booking['bookingitems']
+    booking = Booking.objects.get(pk=booking_id)
+    print(booking)
+    if booking:
+        username, email = User.objects.filter(pk=booking.user.id).values_list('username', 'email').first()
+        items = booking.bookingitems.all()
         msg = ""
         
         for item in items:
-            hostel_id = item['room']['hostel_id']
-            capacity = item['room']['capacity']
-            quantity = item['quantity']
+            hostel_id = item.room.hostel_id
+            capacity = item.room.capacity
+            quantity = item.quantity
             hostel_name = Hostel.objects.filter(pk=hostel_id).values_list('name', flat=True).first()
             msg += f"Hostel Name: {hostel_name}, Capacity: {capacity}, Quantity Booked: {quantity}\n"
-            
+                    
         message = f"Hello {username},\n\nYou have booked the following:\n{msg}\nThank you for your booking."
         
+        print(username)
+        print(email)
+        print(message)
         
         try:
             mail = EmailMessage(

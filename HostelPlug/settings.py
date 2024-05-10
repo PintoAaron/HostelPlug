@@ -253,7 +253,7 @@ CELERY_BROKER_URL='redis://redis:6379/0'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BEAT_SCHEDULE={
     'mail_clients_every_friday':{
-        'task':'core.mail.tasks.mail_clients_every_friday',
+        'task':'core.tasks.mail_clients_every_friday',
         'schedule': crontab(hour=6, minute=54, day_of_week=1)
     }
 }

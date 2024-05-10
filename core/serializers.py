@@ -3,6 +3,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from rest_framework import serializers
 from core.signals import hostel_booked_signal
+from core.tasks import hostel_booked_task
 import logging
 
 from .models import User, Hostel, Location, Room, Review, HostelImage, CartItem, Cart, BookingItem,Booking
@@ -272,8 +273,12 @@ class CreateBookingSerializer(serializers.Serializer):
                 
                 Cart.objects.filter(pk=cart_id).delete()
                 
-                logger.info(f"Booking created  - sending signal")
-                hostel_booked_signal.send_robust(sender=self.__class__, booking=booking)
+                # Send signal to send mail
+                booking_id = booking.id
+                print(booking_id)
+                print("Sending signal")
+                #hostel_booked_signal.send(sender=self.__class__, booking=booking_id)
+                hostel_booked_task.delay(booking_id)
                 
                 return booking
             except Exception as e:
