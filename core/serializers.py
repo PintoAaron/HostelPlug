@@ -2,6 +2,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer,
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from rest_framework import serializers
+from core.signals import hostel_booked_signal
 import logging
 
 from .models import User, Hostel, Location, Room, Review, HostelImage, CartItem, Cart, BookingItem,Booking
@@ -93,9 +94,10 @@ class HostelCreateSerialzer(serializers.ModelSerializer):
     
     
 class RoomSerializer(serializers.ModelSerializer):
+    hostel_id = serializers.IntegerField(read_only=True)
     class Meta:
         model = Room
-        fields = ['id','capacity','price','available_beds']
+        fields = ['id','hostel_id','capacity','price','available_beds']
         
     
     def validate(self, data):
@@ -269,6 +271,9 @@ class CreateBookingSerializer(serializers.Serializer):
                 BookingItem.objects.bulk_create(booking_items)
                 
                 Cart.objects.filter(pk=cart_id).delete()
+                
+                logger.info(f"Booking created  - sending signal")
+                hostel_booked_signal.send_robust(sender=self.__class__, booking=booking)
                 
                 return booking
             except Exception as e:
