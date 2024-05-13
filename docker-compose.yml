@@ -33,13 +33,6 @@ services:
     volumes:
       - redis_data:/data
 
-  smtp4dev:
-    image: rnwood/smtp4dev:v3
-    ports:
-      - 3000:80
-      - 25:25
-    restart: always
-  
   celery:
     build: .
     command: celery -A HostelPlug worker --loglevel=info

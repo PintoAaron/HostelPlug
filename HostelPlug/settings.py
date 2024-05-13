@@ -242,10 +242,12 @@ LOGGING = {
 
 
 
-EMAIL_HOST='smtp4dev'
-EMAIL_PORT='2525'
-EMAIL_HOST_USER=''
-EMAIL_HOST_PASSWORD=''
+EMAIL_HOST='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_USE_TLS=True
+EMAIL_PORT=587
+EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
 
 
 
@@ -254,6 +256,6 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BEAT_SCHEDULE={
     'mail_clients_every_friday':{
         'task':'core.tasks.mail_clients_every_friday',
-        'schedule': crontab(hour=6, minute=54, day_of_week=1)
+        'schedule': crontab(hour=6, minute=54, day_of_week=5)
     }
 }
