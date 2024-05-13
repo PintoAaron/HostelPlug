@@ -12,9 +12,7 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def hostel_booked_task(booking_id):
-    print("Inside hostel_booked_task..................")
     booking = Booking.objects.get(pk=booking_id)
-    print(booking)
     if booking:
         username, email = User.objects.filter(pk=booking.user.id).values_list('username', 'email').first()
         items = booking.bookingitems.all()
@@ -25,13 +23,10 @@ def hostel_booked_task(booking_id):
             capacity = item.room.capacity
             quantity = item.quantity
             hostel_name = Hostel.objects.filter(pk=hostel_id).values_list('name', flat=True).first()
-            msg += f"Hostel Name: {hostel_name}, Capacity: {capacity}, Quantity Booked: {quantity}\n"
+            msg += f"Hostel: {hostel_name}, Capacity: {capacity}, Quantity Booked: {quantity}\n"
                     
         message = f"Hello {username},\n\nYou have booked the following:\n{msg}\nThank you for your booking."
         
-        print(username)
-        print(email)
-        print(message)
         
         try:
             mail = EmailMessage(
@@ -41,7 +36,6 @@ def hostel_booked_task(booking_id):
                 [email],
             )
             mail.send()
-            print("Mail sent successfully")
         except BadHeaderError:
             logger.error(f"Error - failed to send mail to {email}")
             
@@ -50,7 +44,6 @@ def hostel_booked_task(booking_id):
 
 @shared_task
 def mail_clients_every_friday():
-    print("Inside mail_clients_every_friday..................")
     users_info = User.objects.values_list('username', 'email')
     for username, email in users_info:
         message = f"Hello {username},\n\nThis is a reminder to book your hostel for the weekend.\nThank you."
@@ -62,6 +55,5 @@ def mail_clients_every_friday():
                 [email],
             )
             mail.send()
-            print("Mail sent successfully")
         except BadHeaderError:
             logger.error(f"Error - failed to send mail to {email}")

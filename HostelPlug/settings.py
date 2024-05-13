@@ -105,11 +105,10 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
-
 
 
 # Password validation
@@ -174,7 +173,6 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = 'core.User'
 
 DJOSER = {
-    'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
         'user_create': 'core.serializers.UserCreateSerializer',
         'current_user': 'core.serializers.UserSerializer',
@@ -244,20 +242,20 @@ LOGGING = {
 
 
 
-EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST='smtp.gmail.com'
-EMAIL_PORT='587'
 EMAIL_USE_TLS=True
+EMAIL_PORT=587
 EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
 
 
 
-CELERY_BROKER_URL=os.getenv('BROKER_URL')
+CELERY_BROKER_URL='redis://redis:6379/0'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BEAT_SCHEDULE={
     'mail_clients_every_friday':{
         'task':'core.tasks.mail_clients_every_friday',
-        'schedule': crontab(hour=6, minute=54, day_of_week=1)
+        'schedule': crontab(hour=6, minute=54, day_of_week=5)
     }
 }
