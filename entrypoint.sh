@@ -10,6 +10,6 @@ echo "PostgreSQL is ready."
 
 # Run migrations and then start the server
 python manage.py migrate
-python manage.py collectstatic --no-input
 python manage.py create_admin
+python manage.py collectstatic --no-input
 gunicorn HostelPlug.wsgi:application --bind 0.0.0.0:8000
