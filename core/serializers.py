@@ -277,8 +277,7 @@ class CreateBookingSerializer(serializers.Serializer):
                 booking_id = booking.id
                 print(booking_id)
                 print("Sending signal")
-                #hostel_booked_signal.send(sender=self.__class__, booking=booking_id)
-                hostel_booked_task.delay(booking_id)
+                hostel_booked_signal.send_robust(sender=self.__class__, booking_id=booking_id)
                 
                 return booking
             except Exception as e:

@@ -10,5 +10,4 @@ logger = logging.getLogger(__name__)
 def send_hostel_booked_mail(sender,**kwargs):
     logger.info("Received hostel_booked_signal")
     booking_id = kwargs['booking_id']
-    print("finally................................IM HERE")
     hostel_booked_task.delay(booking_id)

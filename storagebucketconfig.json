@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "hostelplug-2e571",
+  "private_key_id": "4cf320c5e7520bfaff50cf57ec7f97f1feddfba5",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDGbE23FF5s92x8\nEeQ0y7mr2m2amNCZbBoYFk6Wjf/1oa5JcnK94Ux6N01AwGxcR3nRPbKhjRr5sN94\nH9njEveP8B9Mog4kzGBJ+gusxJ/Li9EtkS1IXpkVjQjyA41/Norx8LG5IdqOqFIi\niPVXok62sBAK/OXa129w9se6F1cK1/Ua5Rzcebi6XAmVkla3n3BUCZemx1ZmevUC\ncXD/ydCPl9VXVAViHJNw9aLHk2Zls+TGUTDvlgRByofkfMbSD9LVgOR2x3aVe35I\nenHhWNYHP1Zy/4ykM18qioqfK533ZzfTvbSMxPH6rylpsI8BndysDoeSuBH4IWnk\nj45W75iJAgMBAAECggEABocRl3BIGvWY0AwWodYB6bFp4agdVK7FvP0e4L0TKpWD\nEk99jtmWln6zP+oUpoSDcWrCMaZeuNAkyeLiXCIHmuifXvoF1RgUItri/3AIgb27\nx+/6uWLDTn4xSSTsxr6Ym5T7g8elVQQcj55J0/Q2+rOYE4R2W1izBdhYgbq61lRt\nhxIeag9u2bdddAmLamG9m7Wz6bOWFWfOit4v0ph/cOSCQCh76c+6v1Ld6qv/kOwM\n2wXOQMiq2SsIDLIKkFxODfO4NAC0L+wOtOWe3N3DynZDl98QyxanzV2Yji+EzQm6\nt8yEv0EW8FSk6qlsgSRkPuXebg8mAOcipcVlMobywQKBgQD6DGDOkIxrEtqCTwl7\n9QShAQcXCN1HxXjKXVejOmS5jfS9Z5C3QYF9Fcj3KtoAm20YvxJ2k76t2Ponjg8G\nNN34aqnniwEEDrvA7NVu2bu0lOisMgvN03Vm5XhcLykB/wodfrm0eywiy+E7xNBN\nJz8kLQyR2tiwtKqEThU8dBXFTQKBgQDLJVtIk2z1LS4JAkKgWYCwR7FUhFOFuXtJ\nMwZ8dgohw+Yp59bFEXMf97evOqgIlwbxL0zTOUw4RPggueuz+uUZUXTkQaJUDhTr\nUK6KGKM6HgcakG26wo8Uw7e2TNrVX5pmnj/Hk4QgOzPlLWJ+V6a/tG0kRbJAfFLa\njmYE8+6SLQKBgFrroU+687QDWPzE7HfsMdCxZPiVOpDcVv2OT02E8BcgbPtp6w8X\nfJQVFcv6AubxnQvAfmArfMwN93fmicQB+SxY7IrK2oW1LcQK2djCxyP0eV4TnIMs\n/qV5jvhGFa0qJW1wJOphVz0X0UBAYlWLjcQDtWxbnSszpkURd1tSApCJAoGAdPFh\nVitAGvfSO29oqWQ8t73dsHiomB+JgD72aemNtZhPRCppMXL1Ih75R89tcdx3K5p+\nEE44uV/Csxw0OpyhC+0fbFL4PokIs9nzUB4UwN0OW9VuxYdA1MRCWphtlU1+1bod\nnycldWR/YFu7Cl4s6MjV136juYmYLKayxgEiglUCgYEAs2SRft+vIUex/rZbWcml\nIHKpMT4Sv1FAmzRQrf1NMrcZP1esAS+vnn5JtBYA2SrEkV3XUmXgaZ1PL/bUisxM\nXpHbhVCPX2EOvYgYGHg8EEC86RSXSYn2vfl7dAl8X4bP2ZbT8BRHOLqAosOpY41m\nmVLREpB6FWKIHbgtNtf3zgs=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-yalog@hostelplug-2e571.iam.gserviceaccount.com",
+  "client_id": "108838216514146472793",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-yalog%40hostelplug-2e571.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

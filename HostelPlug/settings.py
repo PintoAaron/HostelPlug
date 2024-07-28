@@ -99,17 +99,24 @@ WSGI_APPLICATION = 'HostelPlug.wsgi.application'
 
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DB_NAME'),
+#         'USER': os.getenv('DB_USER'),
+#         'PASSWORD': os.getenv('DB_PASSWORD'),
+#         'HOST': 'db',
+#         'PORT': '5432',
+#     }
+# }
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'db',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -184,34 +191,20 @@ DJOSER = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis:6379/1",
+        "LOCATION": "redis://localhost:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
 }
 
-FIREBASE_CONFIG = {  
-  "type":os.getenv('FIREBASE_TYPE'),
-  "project_id":os.getenv('FIREBASE_PROJECT_ID'),
-  "private_key_id": os.getenv('FIREBASE_PRIVATE_KEY_ID'),
-  "private_key": os.getenv('FIREBASE_PRIVATE_KEY').replace('\\n', '\n'),
-  "client_email": os.getenv('FIREBASE_CLIENT_EMAIL'),
-  "client_id": os.getenv('FIREBASE_CLIENT_ID'),
-  "auth_uri": os.getenv('FIREBASE_AUTH_URI'),
-  "token_uri": os.getenv('FIREBASE_TOKEN_URI'),
-  "auth_provider_x509_cert_url": os.getenv('FIREBASE_AUTH_PROVIDER_X509_CERT_URL'),
-  "client_x509_cert_url": os.getenv('FIREBASE_CLIENT_X509_CERT_URL'),
-  "universe_domain": os.getenv('FIREBASE_UNIVERSE_DOMAIN')
-  
-}
 
-FIREBASE_BUCKET = os.getenv('FIREBASE_BUCKET')
 
-cred = credentials.Certificate(FIREBASE_CONFIG)
-firebase_admin.initialize_app(cred, {
-    'storageBucket': FIREBASE_BUCKET
-})
+#FIREBASE_BUCKET = os.getenv('FIREBASE_BUCKET')
+
+
+cred = credentials.Certificate(os.path.join(BASE_DIR,'storagebucketconfig.json'))
+firebase_admin.initialize_app(cred)
 
 LOGGING = {
     'version': 1,
@@ -251,11 +244,11 @@ EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
 
 
 
-CELERY_BROKER_URL='redis://redis:6379/0'
+CELERY_BROKER_URL='redis://localhost:6379/0'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BEAT_SCHEDULE={
     'mail_clients_every_friday':{
         'task':'core.tasks.mail_clients_every_friday',
-        'schedule': crontab(hour=6, minute=54, day_of_week=5)
+        'schedule': crontab(minute=2)
     }
 }
