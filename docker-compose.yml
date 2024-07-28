@@ -10,29 +10,7 @@ services:
       - .:/app
     ports:
       - "8000:8000"
-    depends_on:
-      - db
-
-  db:
-    image: postgres:13
-    ports:
-      - 5432:5432
-    restart: always
-    environment:
-      POSTGRES_DB: "${DB_NAME}"
-      POSTGRES_USER: "${DB_USER}"
-      POSTGRES_PASSWORD: "${DB_PASSWORD}"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
   
-  redis:
-    image: redis:6.2-alpine
-    ports:
-      - 6379:6379
-    restart: always
-    volumes:
-      - redis_data:/data
-
   celery:
     build: .
     command: celery -A HostelPlug worker --loglevel=info
@@ -49,19 +27,3 @@ services:
     volumes:
       - .:/app
   
-  flower:
-    build: .
-    command: celery -A HostelPlug flower 
-    depends_on:
-      - web
-      - redis
-      - celery
-    ports:
-      - 5555:5555
-    environment:
-      - CELERY_BROKER=redis://redis:6379/0
-      - CELERY_BACKEND=redis://redis:6379/0
-
-volumes:
-  postgres_data:
-  redis_data:
