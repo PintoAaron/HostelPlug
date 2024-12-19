@@ -16,7 +16,7 @@ services:
   db:
     image: postgres:13
     ports:
-      - 5432:5432
+      - 5431:5432
     restart: always
     environment:
       POSTGRES_DB: "${DB_NAME}"
@@ -28,7 +28,7 @@ services:
   redis:
     image: redis:6.2-alpine
     ports:
-      - 6379:6379
+      - 6666:6379
     restart: always
     volumes:
       - redis_data:/data

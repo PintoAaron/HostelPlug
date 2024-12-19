@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+import firebase_admin
 from pathlib import Path
 from datetime import timedelta
-from dotenv import load_dotenv
-import firebase_admin
 from firebase_admin import credentials, storage
+from dotenv import load_dotenv
 from celery.schedules import crontab
 
 load_dotenv()
@@ -74,6 +74,7 @@ INTERNAL_IPS = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -97,26 +98,29 @@ WSGI_APPLICATION = 'HostelPlug.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': 'db',
+        'PORT': '5432',
+    }
+}
 
+
+
+
+cred = credentials.Certificate(os.path.join(BASE_DIR,'storagebucketconfig.json'))
+firebase_admin.initialize_app(cred)
 
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('DB_NAME'),
-#         'USER': os.getenv('DB_USER'),
-#         'PASSWORD': os.getenv('DB_PASSWORD'),
-#         'HOST': 'db',
-#         'PORT': '5432',
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -153,9 +157,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR,'static')
-MEDIA_URL= 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -164,7 +168,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 REST_FRAMEWORK = {
-    
+
     'COERCE_DECIMAL_TO_STRING': False,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -173,8 +177,8 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
-   "ACCESS_TOKEN_LIFETIME": timedelta(days=1)
+    'AUTH_HEADER_TYPES': ('JWT',),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1)
 }
 
 AUTH_USER_MODEL = 'core.User'
@@ -191,20 +195,12 @@ DJOSER = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://localhost:6379/1",
+        "LOCATION": "redis://redis:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
 }
-
-
-
-#FIREBASE_BUCKET = os.getenv('FIREBASE_BUCKET')
-
-
-cred = credentials.Certificate(os.path.join(BASE_DIR,'storagebucketconfig.json'))
-firebase_admin.initialize_app(cred)
 
 LOGGING = {
     'version': 1,
@@ -213,15 +209,11 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
         },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'general.log',
-        }
     },
     'loggers': {
         '': {
-            'handlers': ['console','file'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': True,
         },
     },
@@ -234,21 +226,19 @@ LOGGING = {
 }
 
 
-
-EMAIL_HOST='django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST='smtp.gmail.com'
-EMAIL_USE_TLS=True
-EMAIL_PORT=587
-EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
-
+EMAIL_HOST = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 
-CELERY_BROKER_URL='redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://redis:6379/1'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-CELERY_BEAT_SCHEDULE={
-    'mail_clients_every_friday':{
-        'task':'core.tasks.mail_clients_every_friday',
-        'schedule': crontab(minute=2)
+CELERY_BEAT_SCHEDULE = {
+    'mail_clients_every_friday': {
+        'task': 'core.tasks.mail_clients_every_friday',
+        'schedule': crontab(minute=0, hour=0, day_of_week=5)
     }
 }

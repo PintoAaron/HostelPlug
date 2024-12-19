@@ -14,12 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 class UserCreateSerializer(BaseUserCreateSerializer):
+    username = serializers.CharField(read_only=True)
     class Meta(BaseUserCreateSerializer.Meta):
-        fields = ['id','email','username','password']
+        fields = ['id','email', 'username','password']
         
         
     def save(self, **kwargs):
         self.validated_data['password'] = make_password(self.validated_data['password'])
+        self.validated_data['username'] = self.validated_data['email'].split('@')[0]
         self.instance = User.objects.create(**self.validated_data)
         self.instance.save()
         return self.instance
